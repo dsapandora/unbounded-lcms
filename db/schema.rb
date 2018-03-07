@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180122113704) do
+ActiveRecord::Schema.define(version: 20180307172827) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -227,19 +227,20 @@ ActiveRecord::Schema.define(version: 20180122113704) do
   add_index "material_parts", ["material_id"], name: "index_material_parts_on_material_id", using: :btree
 
   create_table "materials", force: :cascade do |t|
-    t.string   "file_id",                        null: false
+    t.string   "file_id",                          null: false
     t.string   "identifier"
-    t.jsonb    "metadata",          default: {}, null: false
+    t.jsonb    "metadata",          default: {},   null: false
     t.string   "name"
     t.datetime "last_modified_at"
     t.string   "last_author_email"
     t.string   "last_author_name"
     t.text     "original_content"
     t.string   "version"
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
     t.jsonb    "preview_links",     default: {}
     t.datetime "reimported_at"
+    t.boolean  "reimported",        default: true, null: false
   end
 
   add_index "materials", ["file_id"], name: "index_materials_on_file_id", using: :btree
@@ -282,13 +283,6 @@ ActiveRecord::Schema.define(version: 20180122113704) do
 
   add_index "resource_additional_resources", ["additional_resource_id"], name: "index_resource_additional_resources_on_additional_resource_id", using: :btree
   add_index "resource_additional_resources", ["resource_id", "additional_resource_id"], name: "index_resource_additional_resources", unique: true, using: :btree
-
-  create_table "resource_backups", force: :cascade do |t|
-    t.string   "comment",    null: false
-    t.string   "dump"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
 
   create_table "resource_downloads", force: :cascade do |t|
     t.integer  "resource_id"
