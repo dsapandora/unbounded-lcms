@@ -54,10 +54,6 @@ class Resource < ActiveRecord::Base
            foreign_key: 'related_resource_id',
            dependent: :destroy
 
-  # Requirements
-  has_many :resource_requirements, dependent: :destroy
-  has_many :requirements, through: :resource_requirements
-
   has_many :content_guides, through: :unbounded_standards
   has_many :copyright_attributions, dependent: :destroy
   has_many :social_thumbnails, as: :target
