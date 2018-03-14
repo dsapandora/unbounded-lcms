@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180307173100) do
+ActiveRecord::Schema.define(version: 20180314091001) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -381,10 +381,7 @@ ActiveRecord::Schema.define(version: 20180307173100) do
   add_index "sessions", ["updated_at"], name: "index_sessions_on_updated_at", using: :btree
 
   create_table "settings", force: :cascade do |t|
-    t.boolean  "editing_enabled",        default: true, null: false
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.datetime "thumbnails_last_update"
+    t.jsonb "data", default: {}, null: false
   end
 
   create_table "social_thumbnails", force: :cascade do |t|

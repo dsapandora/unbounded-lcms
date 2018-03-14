@@ -53,7 +53,7 @@ module Admin
     end
 
     def update
-      return redirect_to :admin_resources, alert: t('admin.common.editing_disabled') unless Settings.editing_enabled?
+      return redirect_to :admin_resources, alert: t('admin.common.editing_disabled') unless Settings[:editing_enabled]
 
       create_tags
       Array.wrap(create_params[:new_unbounded_standard_names]).each do |std_name|
