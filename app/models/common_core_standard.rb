@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class CommonCoreStandard < Standard
+  CCSS_PREFIXES = %w(ccss.ela-literacy. ccss.math.content. ccss.math.practice.).freeze
+
   belongs_to :standard_strand
   belongs_to :cluster, class_name: 'CommonCoreStandard'
   belongs_to :domain, class_name: 'CommonCoreStandard'
@@ -8,63 +10,11 @@ class CommonCoreStandard < Standard
   scope :clusters, -> { where(label: 'cluster') }
   scope :domains, -> { where(label: 'domain') }
   scope :standards, -> { where(label: 'standard') }
+  scope :with_alt_name, ->(name) { where('? = ANY(alt_names)', name) }
 
-  class << self
-    def find_by_name_or_synonym(name)
-      name = name.downcase
-      find_by_name(name) || where_alt_name(name).first
-    end
-
-    def import
-      api_url = "#{ENV['COMMON_STANDARDS_PROJECT_API_URL']}/api/v1"
-      auth_header = { 'Api-Key' => ENV['COMMON_STANDARDS_PROJECT_API_KEY'] }
-
-      jurisdiction_id = ENV['COMMON_STANDARDS_PROJECT_JURISDICTION_ID']
-      jurisdiction = JSON(RestClient.get("#{api_url}/jurisdictions/#{jurisdiction_id}", auth_header))
-
-      Standard.transaction do
-        jurisdiction['data']['standardSets'].each do |standard_set|
-          create_based_on standard_set
-        end
-      end
-    end
-
-    def where_alt_name(alt_name)
-      where('? = ANY(alt_names)', alt_name)
-    end
-
-    private
-
-    def create_based_on(standard_set)
-      standard_set_id = standard_set['id']
-      standard_set_data = JSON(RestClient.get("#{api_url}/standard_sets/#{standard_set_id}", auth_header))['data']
-
-      grade = standard_set_data['title'].downcase
-      subject = standard_set_data['subject'] == 'Common Core English/Language Arts' ? 'ela' : 'math'
-
-      standard_set_data['standards'].each do |data|
-        asn_identifier = data['asnIdentifier'].downcase
-        name = data['statementNotation'].try(:downcase)
-
-        std_params = name.present? ? { name: name } : { asn_identifier: asn_identifier }
-        standard = find_or_initialize_by(**std_params)
-
-        standard.generate_alt_names
-
-        if (alt_name = data['altStatementNotation']&.downcase)
-          standard.alt_names << alt_name unless standard.alt_names.include?(alt_name)
-        end
-
-        standard.asn_identifier = asn_identifier
-        standard.description = data['description']
-        standard.grades << grade unless standard.grades.include?(grade)
-        standard.label = data['statementLabel']&.downcase
-        standard.name = name if name.present?
-        standard.subject = subject
-
-        standard.save!
-      end
-    end
+  def self.find_by_name_or_synonym(name)
+    name = name.downcase
+    find_by_name(name) || with_alt_name(name).first
   end
 
   def generate_alt_names(regenerate: false)
@@ -73,11 +23,7 @@ class CommonCoreStandard < Standard
     alt_names = Set.new
 
     # ccss.ela-literacy.1.2 -> 1.2
-    short_name = name
-                   .gsub('ccss.ela-literacy.', '')
-                   .gsub('ccss.math.content.', '')
-                   .gsub('ccss.math.practice.', '')
-
+    short_name = CommonCoreStandard::CCSS_PREFIXES.inject(name) { |memo, x| memo.gsub x, '' }
     base_names = Set.new([short_name, short_name.gsub('ccra', 'ra')])
 
     # hsn-rn.b.3 -> n-rn.b.3

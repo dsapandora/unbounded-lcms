@@ -6,7 +6,7 @@ class Standard < ActiveRecord::Base
     'math' => /^(k|pk|\d+)\.[[:alpha:]]+(\.[[:alpha:]]+)?\.\d+(\.[[:alpha:]]+)?$/
   }.freeze
 
-  validates_presence_of :subject
+  validates :subject, presence: true
 
   mount_uploader :language_progression_file, LanguageProgressionFileUploader
 
