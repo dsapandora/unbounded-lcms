@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Download < ActiveRecord::Base
+  S3_URL = 'http://k12-content.s3-website-us-east-1.amazonaws.com/'
+  URL_PUBLIC_PREFIX = 'public://'
+
   mount_uploader :filename, DownloadUploader
   alias_attribute :file, :filename
 
@@ -10,13 +13,9 @@ class Download < ActiveRecord::Base
 
   before_save :update_metadata
 
-  def update_filename(filename)
-    write_attribute(:filename, filename)
-  end
-
   def attachment_url
     if url.present?
-      url.sub('public://', 'http://k12-content.s3-website-us-east-1.amazonaws.com/')
+      url.sub(URL_PUBLIC_PREFIX, S3_URL)
     else
       file.url
     end
