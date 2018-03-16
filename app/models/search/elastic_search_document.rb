@@ -40,15 +40,5 @@ module Search
               end
       repository.search query
     end
-
-    # this is necessary for the ActiveModel::ArraySerializer#as_json method to work
-    # (used on the Pagination#serialize_with_pagination)
-    def read_attribute_for_serialization(key)
-      if key.try(:to_sym) == :id
-        attributes.fetch(key) { id }
-      else
-        attributes[key]
-      end
-    end
   end
 end
