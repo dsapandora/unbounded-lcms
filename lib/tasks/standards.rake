@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 namespace :standards do
+  API_URL = "#{ENV['COMMON_STANDARDS_PROJECT_API_URL']}/api/v1"
+
   desc 'Import all CCSS standards from Common Standards Project'
   task import: [:environment] do
     import_standards
@@ -23,11 +25,10 @@ namespace :standards do
   end
 
   def import_standards
-    api_url = "#{ENV['COMMON_STANDARDS_PROJECT_API_URL']}/api/v1"
     auth_header = { 'Api-Key' => ENV['COMMON_STANDARDS_PROJECT_API_KEY'] }
 
     jurisdiction_id = ENV['COMMON_STANDARDS_PROJECT_JURISDICTION_ID']
-    jurisdiction = JSON(RestClient.get("#{api_url}/jurisdictions/#{jurisdiction_id}", auth_header))
+    jurisdiction = JSON(RestClient.get("#{API_URL}/jurisdictions/#{jurisdiction_id}", auth_header))
 
     Standard.transaction do
       jurisdiction['data']['standardSets'].each do |standard_set|
@@ -38,7 +39,7 @@ namespace :standards do
 
   def create_based_on(standard_set)
     standard_set_id = standard_set['id']
-    standard_set_data = JSON(RestClient.get("#{api_url}/standard_sets/#{standard_set_id}", auth_header))['data']
+    standard_set_data = JSON(RestClient.get("#{API_URL}/standard_sets/#{standard_set_id}", auth_header))['data']
 
     grade = standard_set_data['title'].downcase
     subject = standard_set_data['subject'] == 'Common Core English/Language Arts' ? 'ela' : 'math'
