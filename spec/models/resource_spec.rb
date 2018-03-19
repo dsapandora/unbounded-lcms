@@ -11,6 +11,10 @@ describe Resource do
     let(:factory) { :resource }
   end
 
+  it_behaves_like 'searchable' do
+    let(:factory) { :resource }
+  end
+
   describe '.tree' do
     before do
       2.times { create(:resource) }
