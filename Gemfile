@@ -8,6 +8,7 @@ gem 'rails', '4.2.7.1'
 
 # error handling
 gem 'airbrake', '~> 6.2'
+gem 'puma', '~> 3.4'
 
 # session storage
 gem 'activerecord-session_store', '~> 1.0'
@@ -163,7 +164,7 @@ group :development do
   gem 'bundler-audit', '~> 0.6.0'
   gem 'guard-livereload', '~> 2.5', '>= 2.5.2'
   gem 'pry-rails', '~> 0.3.5'
-  gem 'puma', '~> 3.4'
+
   gem 'quiet_assets', '~> 1.1'
   gem 'rack-livereload', '~> 0.3.16'
   gem 'rack-mini-profiler', '~> 0.10.1', require: false
